@@ -6,11 +6,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.ResourceId;
-import com.google.api.services.youtube.model.SearchListResponse;
-import com.google.api.services.youtube.model.SearchResult;
-import com.google.api.services.youtube.model.Video;
-import com.google.api.services.youtube.model.VideoListResponse;
+import com.google.api.services.youtube.model.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -52,24 +48,33 @@ public class YouTubePopularVideos {
 
     private static List<String> getPopularVideoIds(YouTube youtube, String regionCode) throws IOException {
         // devo usare la youtube videos list invece che youtube search list
-        YouTube.Search.List request = youtube.search().list("id");
-        request.setRelevanceLanguage(regionCode);
+
+        var italianCategories = youtube.videoCategories().list("snippet").setRegionCode(regionCode).setKey(API_KEY).execute().getItems();
+
+        for (VideoCategory vc :
+                italianCategories) {
+            System.out.println(vc.getSnippet().getTitle());
+            System.out.println(vc.getId());
+        }
+
+        YouTube.Videos.List request = youtube.videos().list("id");
+        request.setLocale(regionCode);
+        request.setVideoCategoryId("17");
         request.setKey(API_KEY);
-        request.setType("video");
+        request.setChart("mostPopular");
         request.setRegionCode(regionCode);
-        request.setOrder("date");
-        request.setMaxResults(20L); // You can adjust the number of popular videos to retrieve
-        SearchListResponse response = request.execute();
-        List<SearchResult> items = response.getItems();
+        request.setMaxResults(10L); // You can adjust the number of popular videos to retrieve
+        VideoListResponse response = request.execute();
+        List<Video> items = response.getItems();
 
         System.out.println("Popular Video IDs in " + regionCode + ":");
-        for (SearchResult item : items) {
-            ResourceId rId = item.getId();
-            System.out.println(rId.getVideoId());
+        for (Video item : items) {
+            String rId = item.getId();
+            System.out.println(rId);
         }
 
         return response.getItems().stream()
-                .map(item -> item.getId().getVideoId())
+                .map(Video::getId)
                 .toList();
     }
 
@@ -85,7 +90,6 @@ public class YouTubePopularVideos {
             System.out.println("Title: " + item.getSnippet().getTitle());
             System.out.println("Views: " + item.getStatistics().getViewCount());
             System.out.println("Likes: " + item.getStatistics().getLikeCount());
-            System.out.println("Dislikes: " + item.getStatistics().getDislikeCount());
             System.out.println("Description: " + item.getSnippet().getDescription());
             System.out.println("Published At: " + item.getSnippet().getPublishedAt());
             System.out.println("--------------");
