@@ -21,8 +21,8 @@ public class DataSetEntryController {
     private final DataSetEntryService service;
     
     @GetMapping(path = "/import")
-    public List<DataSetEntry> importVideos(@RequestParam int number){
-        return service.importVideos(number);
+    public List<DataSetEntry> importMostPopularVideosByCountryCode(@RequestParam int number, @RequestParam String countryCode){
+        return service.importMostPopularVideosByCountryCode(number, countryCode);
     }
     
     @GetMapping(path = "/categories")

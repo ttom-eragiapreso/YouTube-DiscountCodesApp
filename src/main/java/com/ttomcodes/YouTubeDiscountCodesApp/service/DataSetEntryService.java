@@ -1,28 +1,51 @@
 package com.ttomcodes.YouTubeDiscountCodesApp.service;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoCategory;
+import com.google.api.services.youtube.model.VideoListResponse;
+import com.ttomcodes.YouTubeDiscountCodesApp.mapper.DataEntrySetMapper;
 import com.ttomcodes.YouTubeDiscountCodesApp.model.DataSetEntry;
+import com.ttomcodes.YouTubeDiscountCodesApp.repository.DataSetEntryRepository;
 import com.ttomcodes.YouTubeDiscountCodesApp.utils.YouTubeUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class DataSetEntryService {
     
-    //@Autowired
     private YouTubeService youTubeService = new YouTubeService();
     
     private YouTube youtube = youTubeService.createYouTubeService();
     
-    public List<DataSetEntry> importVideos(int number){
+    private final DataSetEntryRepository dataSetEntryRepository;
+    
+    private final DataEntrySetMapper mapper;
+    
+    public List<DataSetEntry> importMostPopularVideosByCountryCode(int number, String countryCode){
         
-        
-        return null;
+        YouTube.Videos.List request;
+        try {
+            request = youtube.videos().list("snippet,statistics");
+            request.setKey(YouTubeUtils.API_KEY);
+            request.setMaxResults(Integer.toUnsignedLong(number));
+            request.setRegionCode(countryCode);
+            request.setChart("mostPopular");
+            VideoListResponse response = request.execute();
+            List<Video> items = response.getItems();
+            return dataSetEntryRepository.saveAll(mapper.map(items));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
     }
     
     public List<VideoCategory> listCategoriesByContryCode(String countryCode) {

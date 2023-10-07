@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/?allowPulibcKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/youtube-app?allowPulibcKeyRetrieval=true
     username: root
     password: root
     #driver-class-name: com.mysql.cj.jdbc.Driver
@@ -8,4 +8,5 @@ spring:
     show-sql: false
     #database-platform: org.hibernate.dialect.MySQL5Dialect
     generate-ddl: false
-
+    hibernate:
+      ddl-auto: create
