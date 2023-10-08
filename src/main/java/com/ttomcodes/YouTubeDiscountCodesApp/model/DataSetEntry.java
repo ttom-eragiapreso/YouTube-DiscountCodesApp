@@ -1,6 +1,10 @@
 package com.ttomcodes.YouTubeDiscountCodesApp.model;
 
+import java.time.LocalDate;
 import java.util.UUID;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,4 +35,9 @@ public class DataSetEntry {
     private String customLink;
     
     private String videoId;
+    
+    @CreatedDate
+    private LocalDate importedAt;
+    @LastModifiedDate
+    private LocalDate lastModifiedAt;
 }

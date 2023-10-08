@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.google.api.client.repackaged.com.google.common.base.Optional;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoCategory;
@@ -29,7 +30,7 @@ public class DataSetEntryService {
     
     private final DataEntrySetMapper mapper;
     
-    public List<DataSetEntry> importMostPopularVideosByCountryCode(int number, String countryCode){
+    public List<DataSetEntry> importMostPopularVideosByCountryCodeAndCategoryId(int number, String countryCode, Optional<Integer> categoryId){
         
         YouTube.Videos.List request;
         try {
@@ -38,6 +39,9 @@ public class DataSetEntryService {
             request.setMaxResults(Integer.toUnsignedLong(number));
             request.setRegionCode(countryCode);
             request.setChart("mostPopular");
+            if(categoryId.isPresent()) {
+                request.setVideoCategoryId(categoryId.get().toString());
+            }
             VideoListResponse response = request.execute();
             List<Video> items = response.getItems();
             return dataSetEntryRepository.saveAll(mapper.map(items));

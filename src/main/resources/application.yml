@@ -9,4 +9,4 @@ spring:
     #database-platform: org.hibernate.dialect.MySQL5Dialect
     generate-ddl: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update

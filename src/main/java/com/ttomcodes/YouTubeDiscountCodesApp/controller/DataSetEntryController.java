@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.api.client.repackaged.com.google.common.base.Optional;
 import com.google.api.services.youtube.model.VideoCategory;
 import com.ttomcodes.YouTubeDiscountCodesApp.model.DataSetEntry;
 import com.ttomcodes.YouTubeDiscountCodesApp.service.DataSetEntryService;
@@ -20,9 +21,9 @@ public class DataSetEntryController {
     
     private final DataSetEntryService service;
     
-    @GetMapping(path = "/import")
-    public List<DataSetEntry> importMostPopularVideosByCountryCode(@RequestParam int number, @RequestParam String countryCode){
-        return service.importMostPopularVideosByCountryCode(number, countryCode);
+    @GetMapping(path = "/import-most-popular")
+    public List<DataSetEntry> importMostPopularVideosByCountryCode(@RequestParam int number, @RequestParam String countryCode, @RequestParam Optional<Integer> categoryId){
+        return service.importMostPopularVideosByCountryCodeAndCategoryId(number, countryCode, categoryId);
     }
     
     @GetMapping(path = "/categories")
