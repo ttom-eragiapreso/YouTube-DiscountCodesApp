@@ -1,7 +1,9 @@
 package com.ttomcodes.YouTubeDiscountCodesApp.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,12 +24,22 @@ public class DataSetEntryController {
     private final DataSetEntryService service;
     
     @GetMapping(path = "/import-most-popular")
-    public List<DataSetEntry> importMostPopularVideosByCountryCode(@RequestParam int number, @RequestParam String countryCode, @RequestParam Optional<Integer> categoryId){
+    public List<DataSetEntry> importMostPopularVideosByCountryCode(@RequestParam int number, @RequestParam String countryCode, @RequestParam Optional<String> categoryId){
         return service.importMostPopularVideosByCountryCodeAndCategoryId(number, countryCode, categoryId);
     }
     
     @GetMapping(path = "/categories")
     public List<VideoCategory> getCategoriesForCountryCode(@RequestParam String countryCode){
         return service.listCategoriesByContryCode(countryCode);
+    }
+    
+    @GetMapping(path = "/import-most-popular/all-categories")
+    public List<DataSetEntry> importNumberOfVideosForEachCategoryByCountryCode(@RequestParam int number, @RequestParam String countryCode){
+        return service.importNumberOfVideosForEachCategoryByCountryCode(number, countryCode);
+    }
+    
+    @DeleteMapping(path = "/delete-everything")
+    public void deleteEverything() {
+        service.deleteAllDb();
     }
 }

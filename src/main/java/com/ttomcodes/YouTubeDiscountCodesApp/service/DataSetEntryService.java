@@ -1,6 +1,7 @@
 package com.ttomcodes.YouTubeDiscountCodesApp.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class DataSetEntryService {
     
     private final DataEntrySetMapper mapper;
     
-    public List<DataSetEntry> importMostPopularVideosByCountryCodeAndCategoryId(int number, String countryCode, Optional<Integer> categoryId){
+    public List<DataSetEntry> importMostPopularVideosByCountryCodeAndCategoryId(int number, String countryCode, Optional<String> categoryId){
         
         YouTube.Videos.List request;
         try {
@@ -40,10 +41,11 @@ public class DataSetEntryService {
             request.setRegionCode(countryCode);
             request.setChart("mostPopular");
             if(categoryId.isPresent()) {
-                request.setVideoCategoryId(categoryId.get().toString());
+                request.setVideoCategoryId(categoryId.get());
             }
             VideoListResponse response = request.execute();
             List<Video> items = response.getItems();
+            items = items.stream().filter(v -> !v.getSnippet().getDescription().isEmpty()).toList();
             return dataSetEntryRepository.saveAll(mapper.map(items));
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,6 +67,22 @@ public class DataSetEntryService {
             System.out.println(e.getStackTrace());
             return Collections.emptyList();
         }
+    }
+    
+    public List<DataSetEntry> importNumberOfVideosForEachCategoryByCountryCode(int number, String countryCode){
+        
+        List<VideoCategory> categoriesByCountryCode = listCategoriesByContryCode(countryCode);
+        
+        List<DataSetEntry> result = new ArrayList<>();
+        
+        for(VideoCategory vc : categoriesByCountryCode) {
+           result.addAll(importMostPopularVideosByCountryCodeAndCategoryId(number, countryCode, Optional.of(vc.getId()))); 
+        }
+        return result;
+    }
+    
+    public void deleteAllDb(){
+        dataSetEntryRepository.deleteAll();
     }
     
     
